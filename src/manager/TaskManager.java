@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TaskManager {
-    public static int id;
+    public int id;
     HashMap<Integer, Task> tasks;
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
@@ -21,16 +21,19 @@ public class TaskManager {
     }
 
     public void newTask(Task task) {
+        id++;
         tasks.put(id, task);
     }
 
     public int newEpic(Epic epic) {
+        id++;
         epics.put(id, epic);
 
         return id;
     }
 
     public void newSubtask(Subtask subtask, int idEpic) {
+        id++;
         subtasks.put(id, subtask);
 
         epics.get(idEpic).getIdSubtask().add(id);
