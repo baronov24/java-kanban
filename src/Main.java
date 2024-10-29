@@ -1,3 +1,9 @@
+import enums.Status;
+import manager.TaskManager;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -27,34 +33,34 @@ public class Main {
         subtask = new Subtask(++TaskManager.id, "Вымыть полы", "Влажная уборка", idEpic);
         taskManager.newSubtask(subtask, idEpic);
 
-        taskManager.printList("Task");
-        taskManager.printList("Epic");
-        taskManager.printList("Subtask");
+        taskManager.printList("Tasks.Task");
+        taskManager.printList("Tasks.Epic");
+        taskManager.printList("Tasks.Subtask");
 
         int id = 1;
-        taskManager.changeStatus(id, Status.IN_PROGRESS);
+        taskManager.changeTaskStatus(id, Status.IN_PROGRESS);
 
         id = 2;
-        taskManager.changeStatus(id, Status.DONE);
+        taskManager.changeTaskStatus(id, Status.DONE);
 
-        id = 4;
-        taskManager.changeStatus(id, Status.DONE);
+        id = 3;
+        taskManager.changeEpicStatus(id, Status.DONE);
 
         id = 7;
-        taskManager.changeStatus(id, Status.DONE);
+        taskManager.changeSubtaskStatus(id, Status.DONE);
 
-        taskManager.printList("Task");
-        taskManager.printList("Epic");
-        taskManager.printList("Subtask");
+        taskManager.printList("Tasks.Task");
+        taskManager.printList("Tasks.Epic");
+        taskManager.printList("Tasks.Subtask");
 
         id = 1;
         taskManager.deleteTask(id);
 
         id = 3;
-        taskManager.deleteTask(id);
+        taskManager.deleteEpic(id);
 
-        taskManager.printList("Task");
-        taskManager.printList("Epic");
-        taskManager.printList("Subtask");
+        taskManager.printList("Tasks.Task");
+        taskManager.printList("Tasks.Epic");
+        taskManager.printList("Tasks.Subtask");
     }
 }

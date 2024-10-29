@@ -1,5 +1,7 @@
-import java.util.ArrayList;
+package tasks;
+
 import java.util.Objects;
+import enums.Status;
 
 public class Task {
     private final int id;
@@ -53,44 +55,5 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
-    }
-}
-
-class Epic extends Task {
-    ArrayList<Integer> idSubtask = new ArrayList<>();
-
-    public Epic(int id, String name, String description) {
-        super(id, name, description);
-    }
-
-    @Override
-    public String toString() {
-        return "Задача N " + getId() +
-                ", Название: " + getName() +
-                ", Описание: " + getDescription() +
-                ", Статус: " + getStatus() +
-                ", ID подзадач: " + idSubtask.toString();
-    }
-}
-
-class Subtask extends Task {
-    private final int idEpic;
-
-    public Subtask(int id, String name, String description, int idEpic) {
-        super(id, name, description);
-        this.idEpic = idEpic;
-    }
-
-    public int getIdEpic() {
-        return idEpic;
-    }
-
-    @Override
-    public String toString() {
-        return "Задача N " + getId() +
-                ", Название: " + getName() +
-                ", Описание: " + getDescription() +
-                ", Статус: " + getStatus() +
-                ", ID эпика: " + getIdEpic();
     }
 }
