@@ -32,11 +32,11 @@ public class TaskManager {
         return id;
     }
 
-    public void newSubtask(Subtask subtask, int idEpic) {
+    public void newSubtask(Subtask subtask) {
         id++;
         subtasks.put(id, subtask);
 
-        epics.get(idEpic).getIdSubtask().add(id);
+        epics.get(subtask.getIdEpic()).getIdSubtask().add(id);
     }
 
     public void deleteTask(int idTask) {
@@ -143,42 +143,5 @@ public class TaskManager {
         }
 
         return answer;
-    }
-
-    public void printList(String type) {
-        switch (type) {
-            case "Tasks.Task":
-                System.out.println("Список задач:");
-
-                for (HashMap.Entry<Integer, Task> entry : tasks.entrySet()) {
-                    Integer key = entry.getKey();
-
-                    System.out.println(tasks.get(key).toString());
-                }
-
-                System.out.println();
-                break;
-            case "Tasks.Epic":
-                System.out.println("Список эпиков:");
-
-                for (HashMap.Entry<Integer, Epic> entry : epics.entrySet()) {
-                    Integer key = entry.getKey();
-
-                    System.out.println(epics.get(key).toString());
-                }
-
-                System.out.println();
-                break;
-            case "Tasks.Subtask":
-                System.out.println("Список подзадач:");
-
-                for (HashMap.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
-                    Integer key = entry.getKey();
-
-                    System.out.println(subtasks.get(key).toString());
-                }
-
-                System.out.println();
-        }
     }
 }
