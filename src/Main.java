@@ -18,19 +18,21 @@ public class Main {
         taskManager.newTask(task);
 
         epic = new Epic("Сходить в магазин", "Купить продукты");
-        int idEpic = taskManager.newEpic(epic);
+        taskManager.newEpic(epic);
 
-        subtask = new Subtask("Купить хлеб", "Можно без акции", idEpic);
+        subtask = new Subtask("Купить хлеб", "Можно без акции", 3);
         taskManager.newSubtask(subtask);
 
-        subtask = new Subtask("Купить сыр", "Желательно по акции", idEpic);
+        subtask = new Subtask("Купить сыр", "Желательно по акции", 3);
         taskManager.newSubtask(subtask);
 
         epic = new Epic("Убрать квартиру", "Грязные полы");
-        idEpic = taskManager.newEpic(epic);
+        taskManager.newEpic(epic);
 
-        subtask = new Subtask("Вымыть полы", "Влажная уборка", idEpic);
+        subtask = new Subtask("Вымыть полы", "Влажная уборка", 6);
         taskManager.newSubtask(subtask);
+
+        taskManager.deleteSubtask(4);
 
         int id = 1;
         taskManager.changeTaskStatus(id, Status.IN_PROGRESS);
