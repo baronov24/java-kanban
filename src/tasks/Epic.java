@@ -1,24 +1,36 @@
 package tasks;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    ArrayList<Integer> idSubtask;
+    List<Subtask> listOfSubtasks;
 
-    public Epic(String name, String description) {
-        super(name, description);
-        idSubtask = new ArrayList<>();
+    public Epic(int id, String name, String description) {
+        super(id, name, description);
+        listOfSubtasks = new ArrayList<>();
     }
 
-    public ArrayList<Integer> getIdSubtask() {
-        return idSubtask;
+    public List<Subtask> getListOfSubtasks() {
+        return listOfSubtasks;
     }
 
     @Override
     public String toString() {
-        return "Название: " + getName() +
+        StringBuilder keysOfSubtasks = new StringBuilder();
+
+        for (int i = 0; i < listOfSubtasks.size(); i++) {
+            if (i == 0) {
+                keysOfSubtasks.append(listOfSubtasks.get(i).getId());
+            } else {
+                keysOfSubtasks.append(", ").append(listOfSubtasks.get(i).getId());
+            }
+        }
+
+        return "ID: " + getId() +
+                ", Название: " + getName() +
                 ", Описание: " + getDescription() +
                 ", Статус: " + getStatus() +
-                ", ID подзадач: " + idSubtask.toString();
+                ", ID подзадач: " + keysOfSubtasks;
     }
 }

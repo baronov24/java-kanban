@@ -1,55 +1,64 @@
-import enums.Status;
-import manager.TaskManager;
+import managers.InMemoryTaskManager;
+import managers.Managers;
+import managers.TaskManager;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager manager = new InMemoryTaskManager();
         Task task;
         Epic epic;
         Subtask subtask;
 
-        task = new Task("Купить телевизор", "65 дюймов");
-        taskManager.newTask(task);
+        task = new Task(1, "Купить телевизор", "65 дюймов");
+        manager.newTask(task);
 
-        task = new Task("Прочитать книгу", "Кровь, пот и пиксели");
-        taskManager.newTask(task);
+        task = new Task(2, "Прочитать книгу", "Кровь, пот и пиксели");
+        manager.newTask(task);
 
-        epic = new Epic("Сходить в магазин", "Купить продукты");
-        taskManager.newEpic(epic);
+        epic = new Epic(3, "Сходить в магазин", "Купить продукты");
+        manager.newEpic(epic);
 
-        subtask = new Subtask("Купить хлеб", "Можно без акции", 3);
-        taskManager.newSubtask(subtask);
+        subtask = new Subtask(4, "Купить хлеб", "Можно без акции", epic);
+        manager.newSubtask(subtask);
 
-        subtask = new Subtask("Купить сыр", "Желательно по акции", 3);
-        taskManager.newSubtask(subtask);
+        subtask = new Subtask(5, "Купить сыр", "Желательно по акции", epic);
+        manager.newSubtask(subtask);
 
-        epic = new Epic("Убрать квартиру", "Грязные полы");
-        taskManager.newEpic(epic);
+        epic = new Epic(6, "Убрать квартиру", "Грязные полы");
+        manager.newEpic(epic);
 
-        subtask = new Subtask("Вымыть полы", "Влажная уборка", 6);
-        taskManager.newSubtask(subtask);
+        subtask = new Subtask(7, "Вымыть полы", "Влажная уборка", epic);
+        manager.newSubtask(subtask);
 
-        taskManager.deleteSubtask(4);
+        manager.getTask(1);
 
-        int id = 1;
-        taskManager.changeTaskStatus(id, Status.IN_PROGRESS);
+        printAllTasks(manager);
+    }
 
-        id = 2;
-        taskManager.changeTaskStatus(id, Status.DONE);
+    private static void printAllTasks(TaskManager manager) {
+        System.out.println("Задачи:");
+        for (Task task : manager.getTasks()) {
+            System.out.println(task);
+        }
+        System.out.println("Эпики:");
+        for (Task epic : manager.getEpics()) {
+            System.out.println(epic);
 
-        id = 3;
-        taskManager.changeEpicStatus(id, Status.DONE);
+            for (Task task : manager.getEpicSubtasks(epic.getId())) {
+                System.out.println("--> " + task);
+            }
+        }
+        System.out.println("Подзадачи:");
+        for (Task subtask : manager.getSubtasks()) {
+            System.out.println(subtask);
+        }
 
-        id = 7;
-        taskManager.changeSubtaskStatus(id, Status.DONE);
-
-        id = 1;
-        taskManager.deleteTask(id);
-
-        id = 3;
-        taskManager.deleteEpic(id);
+        System.out.println("История:");
+        for (Task task : Managers.getDefaultHistory().getHistory()) {
+            System.out.println(task);
+        }
     }
 }

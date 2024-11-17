@@ -1,22 +1,23 @@
 package tasks;
 
 public class Subtask extends Task {
-    private final int idEpic;
+    private final Epic parent;
 
-    public Subtask(String name, String description, int idEpic) {
-        super(name, description);
-        this.idEpic = idEpic;
+    public Subtask(int id, String name, String description, Epic parent) {
+        super(id, name, description);
+        this.parent = parent;
     }
 
-    public int getIdEpic() {
-        return idEpic;
+    public Epic getParent() {
+        return parent;
     }
 
     @Override
     public String toString() {
-        return "Название: " + getName() +
+        return "ID: " + getId() +
+                ", Название: " + getName() +
                 ", Описание: " + getDescription() +
                 ", Статус: " + getStatus() +
-                ", ID эпика: " + getIdEpic();
+                ", ID эпика: " + getParent().getId();
     }
 }
