@@ -35,6 +35,7 @@ public class Main {
         manager.newSubtask(subtask);
 
         manager.getTask(1);
+        manager.getTask(2);
 
         printAllTasks(manager);
     }
