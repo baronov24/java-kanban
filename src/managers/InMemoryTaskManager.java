@@ -36,14 +36,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void newSubtask(Subtask subtask) {
-        if (subtask.getParent().getId() == subtask.getId()) {
+        if (subtask.getEpicId() == subtask.getId()) {
             return;
         }
 
         id++;
         subtasks.put(id, subtask);
 
-        subtask.getParent().getListOfSubtasks().add(subtask);
+        epics.get(subtask.getEpicId()).getListOfSubtasks().add(subtask);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubtask(int id) {
-        epics.get(subtasks.get(id).getParent().getId()).getListOfSubtasks().remove(subtasks.get(id));
+        epics.get(subtasks.get(id).getEpicId()).getListOfSubtasks().remove(subtasks.get(id));
 
         subtasks.remove(id);
 
@@ -121,7 +121,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.containsKey(id)) {
             subtasks.get(id).setStatus(status);
 
-            updateEpicStatus(subtasks.get(id).getParent().getId());
+            updateEpicStatus(subtasks.get(id).getEpicId());
         }
     }
 
@@ -180,7 +180,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(int id, Subtask subtask) {
         subtasks.put(id, subtask);
 
-        updateEpicStatus(subtask.getParent().getId());
+        updateEpicStatus(subtask.getEpicId());
     }
 
     @Override

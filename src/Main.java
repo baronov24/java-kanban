@@ -22,16 +22,16 @@ public class Main {
         epic = new Epic(3, "Сходить в магазин", "Купить продукты");
         manager.newEpic(epic);
 
-        subtask = new Subtask(4, "Купить хлеб", "Можно без акции", epic);
+        subtask = new Subtask(4, "Купить хлеб", "Можно без акции", 3);
         manager.newSubtask(subtask);
 
-        subtask = new Subtask(5, "Купить сыр", "Желательно по акции", epic);
+        subtask = new Subtask(5, "Купить сыр", "Желательно по акции", 3);
         manager.newSubtask(subtask);
 
         epic = new Epic(6, "Убрать квартиру", "Грязные полы");
         manager.newEpic(epic);
 
-        subtask = new Subtask(7, "Вымыть полы", "Влажная уборка", epic);
+        subtask = new Subtask(7, "Вымыть полы", "Влажная уборка", 6);
         manager.newSubtask(subtask);
 
         manager.getTask(1);
