@@ -1,15 +1,15 @@
 package tasks;
 
 public class Subtask extends Task {
-    private final Epic parent;
+    private final int epicId;
 
-    public Subtask(int id, String name, String description, Epic parent) {
+    public Subtask(int id, String name, String description, int epicId) {
         super(id, name, description);
-        this.parent = parent;
+        this.epicId = epicId;
     }
 
-    public Epic getParent() {
-        return parent;
+    public int getEpicId() {
+        return epicId;
     }
 
     @Override
@@ -18,6 +18,6 @@ public class Subtask extends Task {
                 ", Название: " + getName() +
                 ", Описание: " + getDescription() +
                 ", Статус: " + getStatus() +
-                ", ID эпика: " + getParent().getId();
+                ", ID эпика: " + getEpicId();
     }
 }
