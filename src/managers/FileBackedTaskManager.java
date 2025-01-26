@@ -186,13 +186,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             for (String line : lines.subList(1, lines.size())) {
                 Task task = fromString(line);
+                String[] array = line.split(",");
+                TypesOfTasks type = TypesOfTasks.valueOf(array[1]);
 
-                if (task instanceof Epic) {
-                    manager.newEpic((Epic) task);
-                } else if (task instanceof Subtask) {
-                    manager.newSubtask((Subtask) task);
-                } else {
-                    manager.newTask(task);
+                switch (type) {
+                    case TASK:
+                        manager.newTask(task);
+                        break;
+                    case EPIC:
+                        manager.newEpic((Epic) task);
+                        break;
+                    case SUBTASK:
+                        manager.newSubtask((Subtask) task);
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Неизвестный тип задачи...");
                 }
             }
         } catch (IOException e) {

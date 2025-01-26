@@ -14,7 +14,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         private Task head;
         private Task tail;
 
-        void linkLast(Task task) {
+        private void linkLast(Task task) {
             Node node;
 
             if (map.containsKey(task.getId())) {
@@ -34,7 +34,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             map.put(task.getId(), node);
         }
 
-        void removeNode(Node node) {
+        private void removeNode(Node node) {
             map.remove(node.getTask().getId());
 
             Task prevTask = node.getPrevTask();
