@@ -5,9 +5,9 @@ import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     private int id;
@@ -15,17 +15,28 @@ public class InMemoryTaskManager implements TaskManager {
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
     HistoryManager history = Managers.getDefaultHistory();
+    Set<Task> prioritizedTasks;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
+        prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime).thenComparingInt(Task::getId));
     }
 
     @Override
     public void newTask(Task task) {
+        if (!checkTime(task)) {
+            System.out.println("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
+            return;
+        }
+
         id++;
         tasks.put(id, task);
+
+        if (task.getStartTime() != null) {
+            prioritizedTasks.add(task);
+        }
     }
 
     @Override
@@ -40,14 +51,25 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
+        if (!checkTime(subtask)) {
+            System.out.println("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
+            return;
+        }
+
         id++;
         subtasks.put(id, subtask);
 
         epics.get(subtask.getEpicId()).getListOfSubtasks().add(subtask);
+
+        if (subtask.getStartTime() != null) {
+            prioritizedTasks.add(subtask);
+            updateEpicTime(subtask.getEpicId());
+        }
     }
 
     @Override
     public void deleteTask(int id) {
+        prioritizedTasks.remove(tasks.get(id));
         tasks.remove(id);
     }
 
@@ -65,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteSubtask(int id) {
         epics.get(subtasks.get(id).getEpicId()).getListOfSubtasks().remove(subtasks.get(id));
-
+        prioritizedTasks.remove(subtasks.get(id));
         subtasks.remove(id);
 
         updateEpicStatus(id);
@@ -73,6 +95,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearTaskList() {
+        for (Task task : tasks.values()) {
+            prioritizedTasks.remove(task);
+        }
+
         tasks.clear();
     }
 
@@ -84,6 +110,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearSubtaskList() {
+        for (Subtask subtask : subtasks.values()) {
+            prioritizedTasks.remove(subtask);
+        }
+
         subtasks.clear();
 
         for (HashMap.Entry<Integer, Epic> entry : epics.entrySet()) {
@@ -221,5 +251,50 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return history.getHistory();
+    }
+
+    public void updateEpicTime(int id) {
+        List<Subtask> listOfSubtasks = epics.get(id).getListOfSubtasks();
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+        Duration duration = Duration.ofMinutes(0);
+
+        for (int i = 0; i < listOfSubtasks.size(); i++) {
+            if (startTime == null || startTime.isAfter(listOfSubtasks.get(i).getStartTime())) {
+                startTime = listOfSubtasks.get(i).getStartTime();
+            }
+
+            if (endTime == null || endTime.isBefore(listOfSubtasks.get(i).getEndTime())) {
+                endTime = listOfSubtasks.get(i).getEndTime();
+            }
+
+            duration = duration.plus(listOfSubtasks.get(i).getDuration());
+        }
+
+        // duration = Duration.between(startTime, endTime);
+
+        epics.get(id).setDuration(duration);
+        epics.get(id).setStartTime(startTime);
+        epics.get(id).setEndTime(endTime);
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return List.of();
+    }
+
+    public boolean checkTime(Task task) {
+        if (task.getStartTime() == null) {
+            return true;
+        }
+
+        for (Task taskPriority : prioritizedTasks) {
+            if (!(task.getStartTime().isAfter(taskPriority.getEndTime()) ||
+                    task.getEndTime().isBefore(taskPriority.getStartTime()))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
