@@ -13,28 +13,29 @@ public class Main {
         Epic epic;
         Subtask subtask;
 
-        task = new Task(1, "Купить телевизор", "65 дюймов");
+        task = new Task(1, "Купить телевизор", "65 дюймов", "01.01.2025, 12:00", 60);
         manager.newTask(task);
 
-        task = new Task(2, "Прочитать книгу", "Кровь, пот и пиксели");
+        task = new Task(2, "Прочитать книгу", "Кровь, пот и пиксели", "02.01.2025, 12:00", 180);
         manager.newTask(task);
 
         epic = new Epic(3, "Сходить в магазин", "Купить продукты");
         manager.newEpic(epic);
 
-        subtask = new Subtask(4, "Купить хлеб", "Можно без акции", epic);
+        subtask = new Subtask(4, "Купить хлеб", "Можно без акции", "03.01.2025, 12:00", 5, 3);
         manager.newSubtask(subtask);
 
-        subtask = new Subtask(5, "Купить сыр", "Желательно по акции", epic);
+        subtask = new Subtask(5, "Купить сыр", "Желательно по акции", "03.01.2025, 12:10", 5, 3);
         manager.newSubtask(subtask);
 
         epic = new Epic(6, "Убрать квартиру", "Грязные полы");
         manager.newEpic(epic);
 
-        subtask = new Subtask(7, "Вымыть полы", "Влажная уборка", epic);
+        subtask = new Subtask(7, "Вымыть полы", "Влажная уборка", "04.01.2025, 12:00", 60, 6);
         manager.newSubtask(subtask);
 
         manager.getTask(1);
+        manager.getTask(2);
 
         printAllTasks(manager);
     }

@@ -1,5 +1,3 @@
-package test;
-
 import managers.InMemoryTaskManager;
 import managers.TaskManager;
 import org.junit.jupiter.api.Assertions;

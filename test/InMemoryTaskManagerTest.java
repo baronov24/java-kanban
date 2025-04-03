@@ -1,5 +1,3 @@
-package test;
-
 import managers.InMemoryTaskManager;
 import managers.TaskManager;
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +17,7 @@ public class InMemoryTaskManagerTest {
         Epic epic = new Epic(2, "Сходить в магазин", "Купить продукты");
         manager.newEpic(epic);
 
-        Subtask subtask = new Subtask(3, "Купить хлеб", "Можно без акции", epic);
+        Subtask subtask = new Subtask(3, "Купить хлеб", "Можно без акции", 2);
         manager.newSubtask(subtask);
 
         Assertions.assertEquals(task, manager.getTask(1));
