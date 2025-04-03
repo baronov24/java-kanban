@@ -95,11 +95,29 @@ public class Task {
 
     @Override
     public String toString() {
-        return "ID: " + getId() +
-                ", Название: " + getName() +
-                ", Описание: " + getDescription() +
-                ", Статус: " + getStatus() +
-                ", Время старта: " + getStartTime() +
-                ", Продолжительность (мин.): " + (getDuration().getSeconds() / 60);
+        if (getStartTime() == null) {
+            return "ID: " + getId() +
+                    ", Название: " + getName() +
+                    ", Описание: " + getDescription() +
+                    ", Статус: " + getStatus();
+        } else {
+            return "ID: " + getId() +
+                    ", Название: " + getName() +
+                    ", Описание: " + getDescription() +
+                    ", Статус: " + getStatus() +
+                    ", Время старта: " + getStartTime() +
+                    ", Продолжительность (мин.): " + (getDuration().getSeconds() / 60);
+        }
+    }
+
+    public String toStringForFile() {
+        if (getStartTime() == null) {
+            return String.format("%d,TASK,%s,%s,%s,null,null",
+                    getId(), getName(), getStatus(), getDescription());
+        } else {
+            return String.format("%d,TASK,%s,%s,%s,%s,%d",
+                    getId(), getName(), getStatus(), getDescription(),
+                    getStartTime(), getDuration().getSeconds() / 60);
+        }
     }
 }

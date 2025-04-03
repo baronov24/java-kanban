@@ -46,4 +46,10 @@ public class Epic extends Task {
                 ", Продолжительность (мин.): " + (getDuration().getSeconds() / 60) +
                 ", ID подзадач: " + keysOfSubtasks;
     }
+
+    @Override
+    public String toStringForFile() {
+        return String.format("%d,EPIC,%s,%s,%s",
+                getId(), getName(), getStatus(), getDescription());
+    }
 }

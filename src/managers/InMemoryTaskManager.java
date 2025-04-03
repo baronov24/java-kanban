@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int id;
     HashMap<Integer, Task> tasks;
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
@@ -31,8 +30,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        id++;
-        tasks.put(id, task);
+        tasks.put(task.getId(), task);
 
         if (task.getStartTime() != null) {
             prioritizedTasks.add(task);
@@ -41,8 +39,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void newEpic(Epic epic) {
-        id++;
-        epics.put(id, epic);
+        epics.put(epic.getId(), epic);
     }
 
     @Override
@@ -56,8 +53,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        id++;
-        subtasks.put(id, subtask);
+        subtasks.put(subtask.getId(), subtask);
 
         epics.get(subtask.getEpicId()).getListOfSubtasks().add(subtask);
 
@@ -270,8 +266,6 @@ public class InMemoryTaskManager implements TaskManager {
 
             duration = duration.plus(listOfSubtasks.get(i).getDuration());
         }
-
-        // duration = Duration.between(startTime, endTime);
 
         epics.get(id).setDuration(duration);
         epics.get(id).setStartTime(startTime);

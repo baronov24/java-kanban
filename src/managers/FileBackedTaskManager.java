@@ -1,7 +1,7 @@
 package managers;
 
 import enums.Status;
-import enums.TypesOfTasks;
+import enums.TaskType;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
@@ -26,35 +26,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         sb.append("id,type,name,status,description,startTime,duration,epic\n");
 
         for (Task task : getTasks()) {
-            sb.append(toString(task)).append("\n");
+            sb.append(task.toStringForFile()).append("\n");
         }
 
         for (Epic epic : getEpics()) {
-            sb.append(toString(epic)).append("\n");
+            sb.append(epic.toStringForFile()).append("\n");
         }
 
         for (Subtask subtask : getSubtasks()) {
-            sb.append(toString(subtask)).append("\n");
+            sb.append(subtask.toStringForFile()).append("\n");
         }
 
         try {
             Files.writeString(file.toPath(), sb.toString());
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения...", e);
-        }
-    }
-
-    String toString(Task task) {
-        if (task instanceof Subtask subtask) {
-            return String.format("%d,SUBTASK,%s,%s,%s,%s,%d,%d",
-                    task.getId(), task.getName(), task.getStatus(), task.getDescription(),
-                    task.getStartTime(), task.getDuration().getSeconds() / 60, subtask.getEpicId());
-        } else if (task instanceof Epic) {
-            return String.format("%d,EPIC,%s,%s,%s",
-                    task.getId(), task.getName(), task.getStatus(), task.getDescription());
-        } else {
-            return String.format("%d,TASK,%s,%s,%s,%s,%d", task.getId(), task.getName(), task.getStatus(), task.getDescription(),
-                    task.getStartTime(), task.getDuration().getSeconds() / 60);
         }
     }
 
@@ -151,7 +137,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     static Task fromString(String value) {
         String[] array = value.split(",");
         int id = Integer.parseInt(array[0]);
-        TypesOfTasks type = TypesOfTasks.valueOf(array[1]);
+        TaskType type = TaskType.valueOf(array[1]);
         String name = array[2];
         Status status = Status.valueOf(array[3]);
         String description = array[4];
@@ -159,13 +145,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Duration duration = null;
         int epicId;
 
-        if (type == TypesOfTasks.SUBTASK) {
+        if (type == TaskType.SUBTASK) {
             epicId = Integer.parseInt(array[7]);
         } else {
             epicId = -1;
         }
 
-        if (type != TypesOfTasks.EPIC) {
+        if (type != TaskType.EPIC && !array[5].equals("null")) {
             startTime = LocalDateTime.parse(array[5]);
             duration = Duration.ofMinutes(Integer.parseInt(array[6]));
         }
@@ -200,7 +186,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (String line : lines.subList(1, lines.size())) {
                 Task task = fromString(line);
                 String[] array = line.split(",");
-                TypesOfTasks type = TypesOfTasks.valueOf(array[1]);
+                TaskType type = TaskType.valueOf(array[1]);
 
                 switch (type) {
                     case TASK:

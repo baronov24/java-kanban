@@ -27,12 +27,32 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "ID: " + getId() +
-                ", Название: " + getName() +
-                ", Описание: " + getDescription() +
-                ", Статус: " + getStatus() +
-                ", Время старта: " + getStartTime() +
-                ", Продолжительность (мин.): " + (getDuration().getSeconds() / 60) +
-                ", ID эпика: " + getEpicId();
+        if (getStartTime() == null) {
+            return "ID: " + getId() +
+                    ", Название: " + getName() +
+                    ", Описание: " + getDescription() +
+                    ", Статус: " + getStatus() +
+                    ", ID эпика: " + getEpicId();
+        } else {
+            return "ID: " + getId() +
+                    ", Название: " + getName() +
+                    ", Описание: " + getDescription() +
+                    ", Статус: " + getStatus() +
+                    ", Время старта: " + getStartTime() +
+                    ", Продолжительность (мин.): " + (getDuration().getSeconds() / 60) +
+                    ", ID эпика: " + getEpicId();
+        }
+    }
+
+    @Override
+    public String toStringForFile() {
+        if (getStartTime() == null) {
+            return String.format("%d,SUBTASK,%s,%s,%s,null,null,%d",
+                    getId(), getName(), getStatus(), getDescription(), getEpicId());
+        } else {
+            return String.format("%d,SUBTASK,%s,%s,%s,%s,%d,%d",
+                    getId(), getName(), getStatus(), getDescription(),
+                    getStartTime(), getDuration().getSeconds() / 60, getEpicId());
+        }
     }
 }
