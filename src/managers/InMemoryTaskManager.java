@@ -295,29 +295,14 @@ public class InMemoryTaskManager implements TaskManager {
     public int newId() {
         int max = 0;
 
-        for(Map.Entry<Integer, Task> entry : tasks.entrySet()) {
-            int key = entry.getKey();
+        for(Map.Entry<Integer, Task> entry : tasks.entrySet())
+            if (max < entry.getKey()) max = entry.getKey();
 
-            if (max < key) {
-                max = key;
-            }
-        }
+        for(Map.Entry<Integer, Epic> entry : epics.entrySet())
+            if (max < entry.getKey()) max = entry.getKey();
 
-        for(Map.Entry<Integer, Epic> entry : epics.entrySet()) {
-            int key = entry.getKey();
-
-            if (max < key) {
-                max = key;
-            }
-        }
-
-        for(Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
-            int key = entry.getKey();
-
-            if (max < key) {
-                max = key;
-            }
-        }
+        for(Map.Entry<Integer, Subtask> entry : subtasks.entrySet())
+            if (max < entry.getKey()) max = entry.getKey();
 
         return max + 1;
     }
