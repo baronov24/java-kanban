@@ -13,6 +13,11 @@ public class Epic extends Task {
         listOfSubtasks = new ArrayList<>();
     }
 
+    public Epic(String name, String description) {
+        super(name, description);
+        listOfSubtasks = new ArrayList<>();
+    }
+
     public List<Subtask> getListOfSubtasks() {
         return listOfSubtasks;
     }

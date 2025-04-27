@@ -1,6 +1,7 @@
 package managers;
 
 import enums.Status;
+import exceptions.TaskTimeOverlapException;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
@@ -26,8 +27,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void newTask(Task task) {
         if (!checkTime(task)) {
-            System.out.println("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
-            return;
+            throw new TaskTimeOverlapException("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
         }
 
         tasks.put(task.getId(), task);
@@ -49,8 +49,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (!checkTime(subtask)) {
-            System.out.println("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
-            return;
+            throw new TaskTimeOverlapException("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
         }
 
         subtasks.put(subtask.getId(), subtask);
@@ -273,8 +272,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<Task> getPrioritizedTasks() {
-        return List.of();
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
     }
 
     public boolean checkTime(Task task) {
@@ -290,5 +289,36 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         return true;
+    }
+
+    @Override
+    public int newId() {
+        int max = 0;
+
+        for(Map.Entry<Integer, Task> entry : tasks.entrySet()) {
+            int key = entry.getKey();
+
+            if (max < key) {
+                max = key;
+            }
+        }
+
+        for(Map.Entry<Integer, Epic> entry : epics.entrySet()) {
+            int key = entry.getKey();
+
+            if (max < key) {
+                max = key;
+            }
+        }
+
+        for(Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
+            int key = entry.getKey();
+
+            if (max < key) {
+                max = key;
+            }
+        }
+
+        return max + 1;
     }
 }

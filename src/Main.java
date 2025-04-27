@@ -6,9 +6,7 @@ import tasks.Task;
 
 public class Main {
     public static void main(String[] args) {
-
-        Managers managers = new Managers();
-        TaskManager manager = managers.getDefault();
+        TaskManager manager = Managers.getDefault();
         Task task;
         Epic epic;
         Subtask subtask;

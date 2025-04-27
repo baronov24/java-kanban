@@ -40,6 +40,24 @@ public class Task {
         this.startTime = startTime;
     }
 
+    public Task(String name, String description, LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        status = Status.NEW;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(String name, String description) {
+        this.name = name;
+        this.description = description;
+        status = Status.NEW;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setStatus(Status status) {
         this.status = status;
     }
