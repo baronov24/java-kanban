@@ -3,6 +3,7 @@ package http.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import enums.HttpMethod;
 import exceptions.TaskTimeOverlapException;
 import http.HttpTaskServer;
 import managers.TaskManager;
@@ -25,25 +26,41 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
+        // HttpMethod вроде как есть в Spring, а я еще не имел с ним дела... сделал через enum
+        HttpMethod httpMethod = HttpMethod.valueOf(exchange.getRequestMethod());
         String[] splitPath = exchange.getRequestURI().getPath().split("/");
         int len = splitPath.length;
 
-        switch (method) {
-            case "GET":
-                if (len == 2) getEpics(exchange);
-                else if (len == 3) getEpic(exchange, splitPath);
-                else if (len == 4) getEpicSubtasks(exchange, splitPath);
-                else sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+        switch (httpMethod) {
+            case GET:
+                if (len == 2) {
+                    getEpics(exchange);
+                } else if (len == 3) {
+                    getEpic(exchange, splitPath);
+                } else if (len == 4) {
+                    getEpicSubtasks(exchange, splitPath);
+                } else {
+                    sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+                }
+
                 break;
-            case "POST":
-                if (len == 2) updateEpic(exchange);
-                else sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+            case POST:
+                if (len == 2) {
+                    updateEpic(exchange);
+                } else {
+                    sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+                }
+
                 break;
-            case "DELETE":
-                if (len == 2) deleteEpics(exchange);
-                else if (len == 3) deleteEpic(exchange, splitPath);
-                else sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+            case DELETE:
+                if (len == 2) {
+                    deleteEpics(exchange);
+                } else if (len == 3) {
+                    deleteEpic(exchange, splitPath);
+                } else {
+                    sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+                }
+
                 break;
             default:
                 sendResponse(exchange, "Неверный синтаксис запроса...", 400);

@@ -3,6 +3,7 @@ package http.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import enums.HttpMethod;
 import exceptions.TaskTimeOverlapException;
 import http.HttpTaskServer;
 import managers.TaskManager;
@@ -24,24 +25,38 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
+        HttpMethod httpMethod = HttpMethod.valueOf(exchange.getRequestMethod());
         String[] splitPath = exchange.getRequestURI().getPath().split("/");
         int len = splitPath.length;
 
-        switch (method) {
-            case "GET":
-                if (len == 2) getSubtasks(exchange);
-                else if (len == 3) getSubtask(exchange, splitPath);
-                else sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+        switch (httpMethod) {
+            case GET:
+                if (len == 2) {
+                    getSubtasks(exchange);
+                } else if (len == 3) {
+                    getSubtask(exchange, splitPath);
+                } else {
+                    sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+                }
+
                 break;
-            case "POST":
-                if (len == 2) updateSubtask(exchange);
-                else sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+            case POST:
+                if (len == 2) {
+                    updateSubtask(exchange);
+                } else {
+                    sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+                }
+
                 break;
-            case "DELETE":
-                if (len == 2) deleteSubtasks(exchange);
-                else if (len == 3) deleteSubtask(exchange, splitPath);
-                else sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+            case DELETE:
+                if (len == 2) {
+                    deleteSubtasks(exchange);
+                } else if (len == 3) {
+                    deleteSubtask(exchange, splitPath);
+                } else {
+                    sendResponse(exchange, "Неверный синтаксис запроса...", 400);
+                }
+
                 break;
             default:
                 sendResponse(exchange, "Неверный синтаксис запроса...", 400);

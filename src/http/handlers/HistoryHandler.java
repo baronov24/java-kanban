@@ -3,6 +3,7 @@ package http.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import enums.HttpMethod;
 import http.HttpTaskServer;
 import managers.TaskManager;
 import tasks.Task;
@@ -21,10 +22,10 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
+        HttpMethod httpMethod = HttpMethod.valueOf(exchange.getRequestMethod());
         String[] splitPath = exchange.getRequestURI().getPath().split("/");
 
-        if (method.equals("GET") && splitPath.length == 2) {
+        if (httpMethod == HttpMethod.GET && splitPath.length == 2) {
             try {
                 List<Task> history = taskManager.getHistory();
 
