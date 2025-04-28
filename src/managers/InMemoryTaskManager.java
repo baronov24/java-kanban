@@ -1,53 +1,70 @@
 package managers;
 
 import enums.Status;
+import exceptions.TaskTimeOverlapException;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int id;
     HashMap<Integer, Task> tasks;
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
     HistoryManager history = Managers.getDefaultHistory();
+    Set<Task> prioritizedTasks;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subtasks = new HashMap<>();
+        prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime).thenComparingInt(Task::getId));
     }
 
     @Override
     public void newTask(Task task) {
-        id++;
-        tasks.put(id, task);
+        if (!checkTime(task)) {
+            throw new TaskTimeOverlapException("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
+        }
+
+        tasks.put(task.getId(), task);
+
+        if (task.getStartTime() != null) {
+            prioritizedTasks.add(task);
+        }
     }
 
     @Override
     public void newEpic(Epic epic) {
-        id++;
-        epics.put(id, epic);
+        epics.put(epic.getId(), epic);
     }
 
     @Override
     public void newSubtask(Subtask subtask) {
-        if (subtask.getParent().getId() == subtask.getId()) {
+        if (subtask.getEpicId() == subtask.getId()) {
             return;
         }
 
-        id++;
-        subtasks.put(id, subtask);
+        if (!checkTime(subtask)) {
+            throw new TaskTimeOverlapException("Ошибка! Обнаружено пересечение времени задач, операция прервана...");
+        }
 
-        subtask.getParent().getListOfSubtasks().add(subtask);
+        subtasks.put(subtask.getId(), subtask);
+
+        epics.get(subtask.getEpicId()).getListOfSubtasks().add(subtask);
+
+        if (subtask.getStartTime() != null) {
+            prioritizedTasks.add(subtask);
+            updateEpicTime(subtask.getEpicId());
+        }
     }
 
     @Override
     public void deleteTask(int id) {
+        prioritizedTasks.remove(tasks.get(id));
         tasks.remove(id);
     }
 
@@ -64,8 +81,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteSubtask(int id) {
-        epics.get(subtasks.get(id).getParent().getId()).getListOfSubtasks().remove(subtasks.get(id));
-
+        epics.get(subtasks.get(id).getEpicId()).getListOfSubtasks().remove(subtasks.get(id));
+        prioritizedTasks.remove(subtasks.get(id));
         subtasks.remove(id);
 
         updateEpicStatus(id);
@@ -73,6 +90,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearTaskList() {
+        for (Task task : tasks.values()) {
+            prioritizedTasks.remove(task);
+        }
+
         tasks.clear();
     }
 
@@ -84,6 +105,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearSubtaskList() {
+        for (Subtask subtask : subtasks.values()) {
+            prioritizedTasks.remove(subtask);
+        }
+
         subtasks.clear();
 
         for (HashMap.Entry<Integer, Epic> entry : epics.entrySet()) {
@@ -121,7 +146,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.containsKey(id)) {
             subtasks.get(id).setStatus(status);
 
-            updateEpicStatus(subtasks.get(id).getParent().getId());
+            updateEpicStatus(subtasks.get(id).getEpicId());
         }
     }
 
@@ -180,7 +205,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateSubtask(int id, Subtask subtask) {
         subtasks.put(id, subtask);
 
-        updateEpicStatus(subtask.getParent().getId());
+        updateEpicStatus(subtask.getEpicId());
     }
 
     @Override
@@ -221,5 +246,73 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return history.getHistory();
+    }
+
+    public void updateEpicTime(int id) {
+        List<Subtask> listOfSubtasks = epics.get(id).getListOfSubtasks();
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+        Duration duration = Duration.ofMinutes(0);
+
+        for (int i = 0; i < listOfSubtasks.size(); i++) {
+            if (startTime == null || startTime.isAfter(listOfSubtasks.get(i).getStartTime())) {
+                startTime = listOfSubtasks.get(i).getStartTime();
+            }
+
+            if (endTime == null || endTime.isBefore(listOfSubtasks.get(i).getEndTime())) {
+                endTime = listOfSubtasks.get(i).getEndTime();
+            }
+
+            duration = duration.plus(listOfSubtasks.get(i).getDuration());
+        }
+
+        epics.get(id).setDuration(duration);
+        epics.get(id).setStartTime(startTime);
+        epics.get(id).setEndTime(endTime);
+    }
+
+    @Override
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+
+    public boolean checkTime(Task task) {
+        if (task.getStartTime() == null) {
+            return true;
+        }
+
+        for (Task taskPriority : prioritizedTasks) {
+            if (!(task.getStartTime().isAfter(taskPriority.getEndTime()) ||
+                    task.getEndTime().isBefore(taskPriority.getStartTime()))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int newId() {
+        int max = 0;
+
+        for (Map.Entry<Integer, Task> entry : tasks.entrySet()) {
+            if (max < entry.getKey()) {
+                max = entry.getKey();
+            }
+        }
+
+        for (Map.Entry<Integer, Epic> entry : epics.entrySet()) {
+            if (max < entry.getKey()) {
+                max = entry.getKey();
+            }
+        }
+
+        for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
+            if (max < entry.getKey()) {
+                max = entry.getKey();
+            }
+        }
+
+        return max + 1;
     }
 }
